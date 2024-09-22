@@ -41,7 +41,7 @@ class User(AbstractUser, BaseModel):
         code = ''.join([str(random.randint(0, 100) % 10) for _ in range(5)])
         UserOtpCode.objects.create(
             user=self,
-            code='11111', # codeni testlash uchun 5 ta 1 sonini qoydim, default code deb qoyilishi kerak
+            code=code, # codeni testlash uchun 5 ta 1 sonini qoydim, default code deb qoyilishi kerak
             expires_at=timezone.now() + timezone.timedelta(minutes=5),
         )
         return code

@@ -3,6 +3,7 @@ from django.core.validators import RegexValidator
 from django.utils.translation import gettext_lazy as _
 
 from rest_framework import serializers
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from account import models
 
@@ -34,5 +35,23 @@ class RegisterSerializer(serializers.ModelSerializer):
 class RegisterVerifySerializer(serializers.Serializer):
     phone_number = serializers.CharField(max_length=100)
     code = serializers.CharField(max_length=5)
+
+
+class ResetPasswordRequestSerializer(serializers.Serializer):
+    phone_number = serializers.CharField(max_length=15)
+
+
+class ResetPasswordVerifySerializer(serializers.Serializer):
+    code = serializers.CharField(max_length=5)
+
+
+class ResetPasswordSerializer(serializers.Serializer):
+    new_password = serializers.CharField(max_length=100)
+    new_password_confirmation = serializers.CharField(max_length=100)
+
+    def validate(self, data):
+        if data['new_password'] != data['new_password_confirmation']:
+            raise serializers.ValidationError("Parollar mos emas")
+        return data
 
 
