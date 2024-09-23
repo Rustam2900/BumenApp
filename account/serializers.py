@@ -25,15 +25,15 @@ class RegisterSerializer(serializers.ModelSerializer):
             password=validated_data['password'],
             is_active=False,
         )
-        user.generate_verify_code()
+        code = user.generate_verify_code()
         return {
             'success': True,
-            'message': 'Telefon raqamingizga sms orqali kod jonatildi'
+            'message': 'Telefon raqamingizga sms orqali kod jonatildi',
+            'code': code,
         }
 
 
 class RegisterVerifySerializer(serializers.Serializer):
-    phone_number = serializers.CharField(max_length=100)
     code = serializers.CharField(max_length=5)
 
 
@@ -55,15 +55,4 @@ class ResetPasswordSerializer(serializers.Serializer):
         return data
 
 
-class InterestSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Interest
-        fields = ['interest_type']
 
-    def create(self, validated_data):
-        user = self.context['request'].user
-        interest = models.Interest.objects.create(
-            interest_type=validated_data['interest_type'],
-            user=user,
-        )
-        return interest
