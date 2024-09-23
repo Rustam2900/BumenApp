@@ -50,6 +50,18 @@ class UserOtpCodeAdmin(admin.ModelAdmin):
         return False
 
 
+@admin.register(models.Option)
+class OptionAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(models.Question)
+class QuestionAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(models.UserQuestionChoice)
+class UserQuestionChoiceAdmin(admin.ModelAdmin):
+    pass
+
 
 
 admin.site.unregister(Group)

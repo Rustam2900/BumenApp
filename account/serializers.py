@@ -55,4 +55,36 @@ class ResetPasswordSerializer(serializers.Serializer):
         return data
 
 
+class UserQuestionChoiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.UserQuestionChoice
+        fields = ('option', )
 
+    def create(self, validated_data):
+        question = models.Question.objects.get(id=self.context['question_id'])
+        option = validated_data['option']
+        user = self.context['request'].user
+
+        user_choice = models.UserQuestionChoice.objects.create(
+            question=question,
+            option=option,
+            user=user,
+        )
+        return user_choice
+
+
+class OptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Option
+        fields = ('id', 'text')
+
+
+class QuestionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Question
+        fields = ('text', 'description')
+
+
+class UserQuestionGetSerializer(serializers.Serializer):
+    question = QuestionSerializer()
+    option = OptionSerializer(many=True)

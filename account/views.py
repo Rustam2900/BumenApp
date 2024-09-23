@@ -110,4 +110,32 @@ class ResetPasswordApiView(generics.GenericAPIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class UserQuestionChoiceApiView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
 
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return serializers.UserQuestionGetSerializer
+        else:
+            return serializers.UserQuestionChoiceSerializer
+
+    def get(self, request, question_id):
+        question = models.Question.objects.get(id=question_id)
+        options = models.Option.objects.filter(question=question)
+
+        question_serializer = serializers.QuestionSerializer(question)
+        options_serializer = serializers.OptionSerializer(options, many=True)
+
+        response_data = {
+            'question': question_serializer.data,
+            'options': options_serializer.data,
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
+
+    def post(self, request, question_id):
+        serializer = serializers.UserQuestionChoiceSerializer(data=request.data, context={'request': request, 'question_id': question_id})
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

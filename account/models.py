@@ -41,7 +41,7 @@ class User(AbstractUser, BaseModel):
         code = ''.join([str(random.randint(0, 100) % 10) for _ in range(5)])
         UserOtpCode.objects.create(
             user=self,
-            code=code, # codeni testlash uchun 5 ta 1 sonini qoydim, default code deb qoyilishi kerak
+            code=code,  # codeni testlash uchun 5 ta 1 sonini qoydim, default code deb qoyilishi kerak
             expires_at=timezone.now() + timezone.timedelta(minutes=5),
         )
         return code
@@ -64,3 +64,30 @@ class UserOtpCode(models.Model):
         verbose_name = _("User OTP Code")
         verbose_name_plural = _("User OTP Codes")
 
+
+class Question(BaseModel):
+    text = models.CharField(_("text"), max_length=255)
+    description = models.TextField()
+
+    def __str__(self):
+        return self.text
+
+
+class Option(BaseModel):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    text = models.CharField(_("text"), max_length=255)
+
+    def __str__(self):
+        return self.text
+
+
+class UserQuestionChoice(BaseModel):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    option = models.ForeignKey(Option, on_delete=models.CASCADE, null=True, blank=True, )
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = (("question", "user",),)
+
+    def __str__(self):
+        return f'{self.question}: {self.option}'

@@ -12,4 +12,5 @@ urlpatterns = [
     path('password-reset/request/', views.ResetPasswordRequestApiView.as_view(), name='password-reset-request'),
     path('password-reset/verify/', views.ResetPasswordVerifyApiView.as_view(), name='password-reset-verify'),
     path('password-reset/password/<int:user_id>/', views.ResetPasswordApiView.as_view(), name='password-reset-password'),
+    path('question/<int:question_id>/', views.UserQuestionChoiceApiView.as_view(), name='question-choice'),
 ]
