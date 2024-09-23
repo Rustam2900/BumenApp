@@ -11,5 +11,6 @@ urlpatterns = [
     path('refresh/', TokenRefreshView.as_view(), name='refresh'),
     path('password-reset/request/', views.ResetPasswordRequestApiView.as_view(), name='password-reset-request'),
     path('password-reset/verify/', views.ResetPasswordVerifyApiView.as_view(), name='password-reset-verify'),
-    path('password-reset/password/<str:token>/', views.ResetPasswordApiView.as_view(), name='password-reset-password'),
+    path('password-reset/password/<int:user_id>/', views.ResetPasswordApiView.as_view(), name='password-reset-password'),
+    path('interest/', views.InterestsApiView.as_view(), name='interests'),
 ]

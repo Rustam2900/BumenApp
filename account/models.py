@@ -65,3 +65,16 @@ class UserOtpCode(models.Model):
         verbose_name_plural = _("User OTP Codes")
 
 
+class Interest(BaseModel):
+    INTEREST_CHOICES = [
+        ('social', 'Social'),
+        ('physical', 'Physical'),
+        ('political', 'Political'),
+        ('economical', 'Economical'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="interests")
+    interest_type = models.CharField(max_length=24, choices=INTEREST_CHOICES)
+
+    def __str__(self):
+        return f'{self.user.phone_number} user interest {self.interest_type}'

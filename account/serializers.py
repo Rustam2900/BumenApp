@@ -55,3 +55,15 @@ class ResetPasswordSerializer(serializers.Serializer):
         return data
 
 
+class InterestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Interest
+        fields = ['interest_type']
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+        interest = models.Interest.objects.create(
+            interest_type=validated_data['interest_type'],
+            user=user,
+        )
+        return interest
