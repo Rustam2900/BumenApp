@@ -24,11 +24,10 @@ class RegisterVerifyApiView(generics.GenericAPIView):
     def post(self, request):
         serializer = serializers.RegisterVerifySerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            phone_number = serializer.data['phone_number']
             code = serializer.data['code']
             try:
-                user = models.User.objects.get(phone_number=phone_number)
                 otp_code = models.UserOtpCode.objects.get(code=code)
+                user = models.User.objects.get(id=otp_code.user.id)
             except models.User.DoesNotExist and models.UserOtpCode.DoesNotExist:
                 return Response(status=status.HTTP_404_NOT_FOUND)
             if otp_code.expires_at > timezone.now() and otp_code.is_used == False:
@@ -36,7 +35,8 @@ class RegisterVerifyApiView(generics.GenericAPIView):
                 otp_code.is_used = True
                 user.save()
                 otp_code.save()
-                return Response({'success': True, 'message': 'User is activated'}, status=status.HTTP_200_OK)
+                token = RefreshToken.for_user(user)
+                return Response({'success': True, 'tokens': {'refresh': str(token), 'access': str(token.access_token)}}, status=status.HTTP_200_OK)
             else:
                 return Response(
                     {'success': False, 'messages': 'User is not activated, Code is incorrect'},
@@ -73,11 +73,8 @@ class ResetPasswordVerifyApiView(generics.GenericAPIView):
             try:
                 otp_code = models.UserOtpCode.objects.get(code=code)
                 if otp_code.is_used != False or otp_code.expires_at < timezone.now():
-                    return Response({''},status=status.HTTP_404_NOT_FOUND)
+                    return Response({'success': False},status=status.HTTP_404_NOT_FOUND)
                 otp_code.is_used = True
-
-
-
                 user = otp_code.user
 
                 if user:
@@ -113,11 +110,4 @@ class ResetPasswordApiView(generics.GenericAPIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class InterestsApiView(generics.ListCreateAPIView):
-    permission_classes = [permissions.IsAuthenticated]
-    serializer_class = serializers.InterestSerializer
-    def get_queryset(self):
-        return models.Interest.objects.filter(user=self.request.user)
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
